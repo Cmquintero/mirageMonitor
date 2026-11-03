@@ -3,7 +3,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 
-from app.database.session import get_db
+from app.database.session import get_db, engine
+from app.database.base import Base
+import app.models
+from app.routers import dashboard
+
+# Crear las tablas en PostgreSQL si no existen
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="Mirage Monitor API",
@@ -18,6 +24,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Registrar Routers de la API
+app.include_router(dashboard.router)
 
 
 @app.get("/", tags=["General"])
